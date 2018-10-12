@@ -1,18 +1,18 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
-import lombok.EqualsAndHashCode;
+import lombok.Value;
 
 import java.util.UUID;
 
-@EqualsAndHashCode
+@Value
 public final class AccountId {
   private final UUID uuid;
 
-  private AccountId(final UUID uuid) {
-    this.uuid = uuid;
-  }
-
   public static AccountId forNewAccount() {
     return new AccountId(UUID.randomUUID());
+  }
+
+  public static AccountId of(final String id) {
+    return new AccountId(UUID.fromString(id));
   }
 }

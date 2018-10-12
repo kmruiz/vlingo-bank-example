@@ -1,6 +1,7 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
 import io.vlingo.actors.Actor;
+import io.vlingo.actors.Completes;
 
 public class AccountActor extends Actor implements Account {
   private final AccountId accountId;
@@ -12,33 +13,40 @@ public class AccountActor extends Actor implements Account {
   }
 
   @Override
-  public AccountBalance transfer(final AccountAmount amount, final AccountId beneficiary) {
+  public Completes<AccountBalance> transfer(final AccountAmount amount, final AccountId beneficiary) {
+    var eventually = completesEventually();
+
     if (currentBalance.thereIsEnoughFor(amount)) {
       Account.find(stage(), beneficiary)
           .andThen(beneficiaryAccount -> {
-            beneficiaryAccount.deposit(amount);
-            this.withdraw(amount);
-          }).await();
+            beneficiaryAccount.deposit(amount)
+                .andThen(i -> {
+                  this.withdraw(amount)
+                      .andThen(finalBalance -> {
+                        eventually.with(currentBalance);
+                      });
+                });
+          });
     }
 
-    return this.currentBalance;
+    return completes();
   }
 
   @Override
-  public AccountBalance deposit(final AccountAmount amount) {
+  public Completes<AccountBalance> deposit(final AccountAmount amount) {
     this.currentBalance = this.currentBalance.add(amount);
-    return this.currentBalance;
+    return completes().with(this.currentBalance);
   }
 
   @Override
-  public AccountBalance withdraw(final AccountAmount amount) {
+  public Completes<AccountBalance> withdraw(final AccountAmount amount) {
     this.currentBalance = this.currentBalance.substract(amount);
-    return this.currentBalance;
+    return completes().with(this.currentBalance);
   }
 
   @Override
-  public AccountBalance balance() {
-    return this.currentBalance;
+  public Completes<AccountBalance> balance() {
+    return completes().with(this.currentBalance);
   }
 
   @Override
@@ -48,5 +56,6 @@ public class AccountActor extends Actor implements Account {
     }
 
     this.stop();
+    completes().with(accountId);
   }
 }

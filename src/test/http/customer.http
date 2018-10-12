@@ -1,0 +1,31 @@
+### Creates a new customer
+POST http://localhost:8080/customers
+
+> {%
+var json = JSON.parse(response.body);
+client.global.set("customerId", json.uuid);
+%}
+
+### Creates a new account for a given customer
+POST http://localhost:8080/customers/{{customerId}}/accounts
+Content-Type: application/json
+
+{
+  "accountName": "My New Account"
+}
+
+> {%
+var json = JSON.parse(response.body);
+client.global.set("accountId", json.uuid);
+%}
+
+###
+
+PUT http://localhost:8080/customers/{{customerId}}/accounts/{{accountId}}
+Content-Type: application/json
+
+{
+  "amount": 245.02
+}
+
+###

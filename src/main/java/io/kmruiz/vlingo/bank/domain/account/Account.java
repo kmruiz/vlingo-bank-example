@@ -5,10 +5,10 @@ import io.vlingo.actors.Completes;
 import io.vlingo.actors.Stage;
 
 public interface Account {
-  AccountBalance transfer(final AccountAmount amount, final AccountId beneficiary);
-  AccountBalance deposit(final AccountAmount amount);
-  AccountBalance withdraw(final AccountAmount amount);
-  AccountBalance balance();
+  Completes<AccountBalance> transfer(final AccountAmount amount, final AccountId beneficiary);
+  Completes<AccountBalance> deposit(final AccountAmount amount);
+  Completes<AccountBalance> withdraw(final AccountAmount amount);
+  Completes<AccountBalance> balance();
   void close();
 
   static Completes<Account> find(final Stage stage, final AccountId accountId) {
@@ -16,6 +16,8 @@ public interface Account {
   }
 
   static Address addressOf(final Stage stage, final AccountId accountId) {
-    return stage.world().addressFactory().findableBy(accountId);
+    return stage.world().addressFactory().from(
+        String.valueOf(accountId.getUuid().getMostSignificantBits() & Long.MAX_VALUE)
+    );
   }
 }

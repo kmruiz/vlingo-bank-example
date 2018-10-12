@@ -1,6 +1,9 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
+import io.vlingo.actors.Completes;
+
 public interface AccountOwner {
-  AccountId openAccount(final AccountName accountName);
+  Completes<AccountId> openAccount(final AccountName accountName);
+  Completes<Account> getAccount(final AccountId accountId);
   void closeAccount(final AccountId accountId);
 }

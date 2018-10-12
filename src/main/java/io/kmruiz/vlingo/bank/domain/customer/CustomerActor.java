@@ -5,23 +5,24 @@ import io.kmruiz.vlingo.bank.domain.account.AccountActor;
 import io.kmruiz.vlingo.bank.domain.account.AccountId;
 import io.kmruiz.vlingo.bank.domain.account.AccountName;
 import io.vlingo.actors.Actor;
-import io.vlingo.actors.Address;
+import io.vlingo.actors.Completes;
 import io.vlingo.actors.Definition;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class CustomerActor extends Actor implements Customer {
+  private final CustomerId id;
   private final Set<AccountId> accounts;
 
-  public CustomerActor() {
+  public CustomerActor(final CustomerId id) {
+    this.id = id;
     this.accounts = new HashSet<>();
   }
 
   @Override
-  public AccountId openAccount(final AccountName accountName) {
+  public Completes<AccountId> openAccount(final AccountName accountName) {
     final var accountId = AccountId.forNewAccount();
     final var accountAddress = Account.addressOf(stage(), accountId);
 
@@ -31,7 +32,18 @@ public class CustomerActor extends Actor implements Customer {
         accountAddress);
 
     this.accounts.add(accountId);
-    return accountId;
+    return completes().with(accountId);
+  }
+
+  @Override
+  public Completes<Account> getAccount(final AccountId accountId) {
+    var eventually = completesEventually();
+
+    if (this.accounts.contains(accountId)) {
+      Account.find(stage(), accountId).andThen(eventually::with);
+    }
+
+    return completes();
   }
 
   @Override
