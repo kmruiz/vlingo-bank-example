@@ -39,6 +39,18 @@ public class CustomerResource extends ResourceHandler {
         });
   }
 
+  public void getAccountBalanceForCustomer(final String customerId, final String accountId) {
+    Customer.find(stage(), CustomerId.of(customerId))
+        .andThen(customer -> {
+          customer.getAccount(AccountId.of(accountId))
+              .andThen(account -> {
+                account.balance().andThen(balance -> {
+                  completes().with(Response.of(Response.Status.Ok, serialized(balance)));
+                });
+              });
+        });
+  }
+
   public void depositIntoAccount(final String customerId, final String accountId, final DepositRequest deposit) {
     Customer.find(stage(), CustomerId.of(customerId))
         .after(customer -> {

@@ -48,6 +48,20 @@ client.test("A deposit for the customer account has been done successfully", fun
 });
 %}
 
+### Get the balance of an account
+
+GET http://localhost:8080/customers/{{customerId}}/accounts/{{accountId}}
+Connection: close
+
+> {%
+client.test("Gets the balance of an account successfully", function() {
+    var value = JSON.parse(response.body).value;
+
+   client.assert(response.status === 200, "Response must be 200 OK");
+   client.assert(value === 1000.0, "Amount in the account must be 1000.0");
+});
+%}
+
 ### Creates a new customer (beneficiary)
 
 POST http://localhost:8080/customers
