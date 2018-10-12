@@ -9,7 +9,6 @@ import io.vlingo.actors.Completes;
 import io.vlingo.actors.Definition;
 
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class CustomerActor extends Actor implements Customer {
@@ -47,14 +46,21 @@ public class CustomerActor extends Actor implements Customer {
   }
 
   @Override
-  public void closeAccount(final AccountId accountId) {
+  public Completes<AccountId> closeAccount(final AccountId accountId) {
+    var eventually = completesEventually();
+
     if (this.accounts.contains(accountId)) {
       Account.find(stage(), accountId)
           .andThen(account -> {
-            account.close();
-            this.accounts.remove(accountId);
-            completes().with(account);
+            account.close().after(e -> {
+              this.accounts.remove(accountId);
+              eventually.with(accountId);
+            });
           });
+    } else {
+      eventually.with(null);
     }
+
+    return completes();
   }
 }

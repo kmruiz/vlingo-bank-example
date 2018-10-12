@@ -9,7 +9,7 @@ public interface Account {
   Completes<AccountBalance> deposit(final AccountAmount amount);
   Completes<AccountBalance> withdraw(final AccountAmount amount);
   Completes<AccountBalance> balance();
-  void close();
+  Completes<AccountId> close();
 
   static Completes<Account> find(final Stage stage, final AccountId accountId) {
     return stage.actorOf(addressOf(stage, accountId), Account.class);

@@ -9,24 +9,23 @@ public class AccountActor extends Actor implements Account {
 
   public AccountActor(final AccountId accountId) {
     this.accountId = accountId;
-    this.currentBalance = AccountBalance.zero();
+    this.currentBalance = AccountBalance.zero(accountId);
   }
 
   @Override
   public Completes<AccountBalance> transfer(final AccountAmount amount, final AccountId beneficiary) {
     var eventually = completesEventually();
 
-    if (currentBalance.thereIsEnoughFor(amount)) {
+    if (currentBalance.thereIsEnoughMoneyFor(amount)) {
       Account.find(stage(), beneficiary)
           .andThen(beneficiaryAccount -> {
             beneficiaryAccount.deposit(amount)
                 .andThen(i -> {
-                  this.withdraw(amount)
-                      .andThen(finalBalance -> {
-                        eventually.with(currentBalance);
-                      });
+                  selfAs(Account.class).withdraw(amount).andThen(eventually::with);
                 });
           });
+    } else {
+      eventually.with(currentBalance);
     }
 
     return completes();
@@ -40,7 +39,7 @@ public class AccountActor extends Actor implements Account {
 
   @Override
   public Completes<AccountBalance> withdraw(final AccountAmount amount) {
-    this.currentBalance = this.currentBalance.substract(amount);
+    this.currentBalance = this.currentBalance.subtract(amount);
     return completes().with(this.currentBalance);
   }
 
@@ -50,12 +49,7 @@ public class AccountActor extends Actor implements Account {
   }
 
   @Override
-  public void close() {
-    if (!this.currentBalance.isEmpty()) {
-      throw new IllegalStateException("Can not close account " + accountId + " because it's not empty.");
-    }
-
-    this.stop();
-    completes().with(accountId);
+  public Completes<AccountId> close() {
+    return completes().with(accountId);
   }
 }

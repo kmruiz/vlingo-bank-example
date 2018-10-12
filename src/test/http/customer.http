@@ -86,14 +86,70 @@ Connection: close
   "to": "{{beneficiaryAccountId}}"
 }
 
-### Withdraw money from the beneficiary
+> {%
+client.test("A deposit for the customer account has been done successfully", function() {
+    var value = JSON.parse(response.body).value;
+
+   client.assert(response.status === 200, "Response must be 200 OK");
+   client.assert(value === 500.0, "Amount in the account must be 500.0");
+});
+%}
+
+### Withdraw money from the owner account
 
 PUT http://localhost:8080/customers/{{customerId}}/accounts/{{accountId}}/withdraw
 Content-Type: application/json
 Connection: close
 
 {
-  "amount": 250
+  "amount": 500
 }
+
+> {%
+client.test("A deposit for the customer account has been done successfully", function() {
+    var value = JSON.parse(response.body).value;
+
+   client.assert(response.status === 200, "Response must be 200 OK");
+   client.assert(value === 0.0, "Amount in the account must be 0.0");
+});
+%}
+
+### Withdraw all money from beneficiary account
+PUT http://localhost:8080/customers/{{beneficiaryId}}/accounts/{{beneficiaryAccountId}}/withdraw
+Content-Type: application/json
+Connection: close
+
+{
+  "amount": 500
+}
+
+> {%
+client.test("A deposit for the customer account has been done successfully", function() {
+    var value = JSON.parse(response.body).value;
+
+   client.assert(response.status === 200, "Response must be 200 OK");
+   client.assert(value === 0.0, "Amount in the account must be 0.0");
+});
+%}
+
+### Delete beneficiary account
+DELETE http://localhost:8080/customers/{{beneficiaryId}}/accounts/{{beneficiaryAccountId}}
+Connection: close
+
+> {%
+client.test("Beneficiary account has been deleted", function() {
+   client.assert(response.status === 200, "Response must be 200 OK");
+});
+%}
+
+### Delete owner account
+DELETE http://localhost:8080/customers/{{customerId}}/accounts/{{accountId}}
+Connection: close
+
+> {%
+client.test("Owner account has been deleted", function() {
+   client.assert(response.status === 200, "Response must be 200 OK");
+});
+%}
 
 ###

@@ -13,7 +13,7 @@ import static io.vlingo.http.resource.serialization.JsonSerialization.serialized
 public class TransferResource extends ResourceHandler {
   public void transferBetweenAccounts(final TransferRequest transfer) {
     Customer.find(stage(), CustomerId.of(transfer.getFrom().getCustomer()))
-        .after(customer -> {
+        .andThen(customer -> {
           customer.getAccount(AccountId.of(transfer.getFrom().getAccount()))
               .andThen(account -> {
                 account.transfer(AccountAmount.of(transfer.getAmount()), AccountId.of(transfer.getTo()))

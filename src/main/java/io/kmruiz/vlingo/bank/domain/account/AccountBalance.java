@@ -3,9 +3,11 @@ package io.kmruiz.vlingo.bank.domain.account;
 import java.math.BigDecimal;
 
 public class AccountBalance {
+  private final AccountId account;
   private final BigDecimal value;
 
-  private AccountBalance(final BigDecimal value) {
+  private AccountBalance(final AccountId account, final BigDecimal value) {
+    this.account = account;
     if (value.compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalStateException("Invalid negative balance " + value);
     }
@@ -13,23 +15,19 @@ public class AccountBalance {
     this.value = value;
   }
 
-  public static AccountBalance zero() {
-    return new AccountBalance(BigDecimal.ZERO);
+  public static AccountBalance zero(final AccountId accountId) {
+    return new AccountBalance(accountId, BigDecimal.ZERO);
   }
 
-  public boolean thereIsEnoughFor(final AccountAmount amount) {
-    return value.compareTo(amount.getValue()) < 0;
+  public boolean thereIsEnoughMoneyFor(final AccountAmount amount) {
+    return value.compareTo(amount.getValue()) >= 0;
   }
 
   public AccountBalance add(final AccountAmount amount) {
-    return new AccountBalance(value.add(amount.getValue()));
+    return new AccountBalance(account, value.add(amount.getValue()));
   }
 
-  public AccountBalance substract(final AccountAmount amount) {
-    return new AccountBalance(value.subtract(amount.getValue()));
-  }
-
-  public boolean isEmpty() {
-    return value.equals(BigDecimal.ZERO);
+  public AccountBalance subtract(final AccountAmount amount) {
+    return new AccountBalance(account, value.subtract(amount.getValue()));
   }
 }

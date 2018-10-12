@@ -64,4 +64,14 @@ public class CustomerResource extends ResourceHandler {
               });
         });
   }
+
+  public void closeAccount(final String customerId, final String accountId) {
+    Customer.find(stage(), CustomerId.of(customerId))
+        .after(customer -> {
+          customer.closeAccount(AccountId.of(accountId))
+              .andThen(n -> {
+                completes().with(Response.of(Response.Status.Ok, serialized(n)));
+              });
+        });
+  }
 }
