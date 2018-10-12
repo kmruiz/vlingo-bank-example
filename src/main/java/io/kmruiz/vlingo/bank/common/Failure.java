@@ -1,5 +1,6 @@
 package io.kmruiz.vlingo.bank.common;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Failure<E extends RuntimeException, O> implements Result<E, O> {
@@ -25,7 +26,7 @@ public class Failure<E extends RuntimeException, O> implements Result<E, O> {
   }
 
   @Override
-  public <T> T resolve(final Function<E, T> onError, final Function<O, T> onSuccess) {
-    return onError.apply(exception);
+  public void resolve(final Consumer<E> onError, final Consumer<O> onSuccess) {
+    onError.accept(exception);
   }
 }

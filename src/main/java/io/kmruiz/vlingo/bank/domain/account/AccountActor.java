@@ -1,5 +1,6 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
+import io.kmruiz.vlingo.bank.common.Result;
 import io.vlingo.actors.Actor;
 import io.vlingo.actors.Completes;
 
@@ -13,7 +14,7 @@ public class AccountActor extends Actor implements Account {
   }
 
   @Override
-  public Completes<AccountBalance> transfer(final AccountAmount amount, final AccountId beneficiary) {
+  public Completes<Result<IllegalArgumentException, AccountBalance>> transfer(final AccountAmount amount, final AccountId beneficiary) {
     var eventually = completesEventually();
 
     if (currentBalance.thereIsEnoughMoneyFor(amount)) {
@@ -32,24 +33,24 @@ public class AccountActor extends Actor implements Account {
   }
 
   @Override
-  public Completes<AccountBalance> deposit(final AccountAmount amount) {
+  public Completes<Result<IllegalArgumentException, AccountBalance>> deposit(final AccountAmount amount) {
     this.currentBalance = this.currentBalance.add(amount);
-    return completes().with(this.currentBalance);
+    return completes().with(Result.ofSuccess(this.currentBalance));
   }
 
   @Override
-  public Completes<AccountBalance> withdraw(final AccountAmount amount) {
+  public Completes<Result<IllegalArgumentException, AccountBalance>> withdraw(final AccountAmount amount) {
     this.currentBalance = this.currentBalance.subtract(amount);
-    return completes().with(this.currentBalance);
+    return completes().with(Result.ofSuccess(this.currentBalance));
   }
 
   @Override
-  public Completes<AccountBalance> balance() {
-    return completes().with(this.currentBalance);
+  public Completes<Result<IllegalArgumentException, AccountBalance>> balance() {
+    return completes().with(Result.ofSuccess(this.currentBalance));
   }
 
   @Override
-  public Completes<AccountId> close() {
-    return completes().with(accountId);
+  public Completes<Result<IllegalArgumentException, AccountId>> close() {
+    return completes().with(Result.ofSuccess(this.accountId));
   }
 }
