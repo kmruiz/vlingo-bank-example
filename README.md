@@ -24,3 +24,4 @@ To Do
 
 * Unit tests for vlingo actors
 * Flatten `Complete<T>` calls when supported.
+* Error handling
