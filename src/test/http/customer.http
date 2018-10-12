@@ -1,7 +1,12 @@
 ### Creates a new customer
 POST http://localhost:8080/customers
+Connection: close
 
 > {%
+client.test("Customer has been properly created", function() {
+   client.assert(response.status === 201, "Response must be 201 CREATED");
+});
+
 var json = JSON.parse(response.body);
 client.global.set("customerId", json.uuid);
 %}
@@ -9,23 +14,86 @@ client.global.set("customerId", json.uuid);
 ### Creates a new account for a given customer
 POST http://localhost:8080/customers/{{customerId}}/accounts
 Content-Type: application/json
+Connection: close
 
 {
   "accountName": "My New Account"
 }
 
 > {%
+client.test("Customer account has been properly created", function() {
+   client.assert(response.status === 201, "Response must be 201 CREATED");
+});
+
 var json = JSON.parse(response.body);
 client.global.set("accountId", json.uuid);
 %}
 
-###
+### Deposits some money into the account
 
 PUT http://localhost:8080/customers/{{customerId}}/accounts/{{accountId}}
 Content-Type: application/json
+Connection: close
 
 {
-  "amount": 245.02
+  "amount": 1000.0
+}
+
+> {%
+client.test("A deposit for the customer account has been done successfully", function() {
+    var value = JSON.parse(response.body).value;
+
+   client.assert(response.status === 200, "Response must be 200 OK");
+   client.assert(value === 1000.0, "Amount in the account must be 1000.0");
+});
+%}
+
+### Creates a new customer (beneficiary)
+
+POST http://localhost:8080/customers
+Connection: close
+
+> {%
+var json = JSON.parse(response.body);
+client.global.set("beneficiaryId", json.uuid);
+%}
+
+### Creates a new account for the beneficiary)
+
+POST http://localhost:8080/customers/{{beneficiaryId}}/accounts
+Content-Type: application/json
+Connection: close
+
+{
+  "accountName": "My New Account"
+}
+
+
+> {%
+var json = JSON.parse(response.body);
+client.global.set("beneficiaryAccountId", json.uuid);
+%}
+
+### Transfer money from accounts
+
+PUT http://localhost:8080/transfer
+Content-Type: application/json
+Connection: close
+
+{
+  "from": { "customer": "{{customerId}}", "account": "{{accountId}}" },
+  "amount": 500,
+  "to": "{{beneficiaryAccountId}}"
+}
+
+### Withdraw money from the beneficiary
+
+PUT http://localhost:8080/customers/{{customerId}}/accounts/{{accountId}}/withdraw
+Content-Type: application/json
+Connection: close
+
+{
+  "amount": 250
 }
 
 ###

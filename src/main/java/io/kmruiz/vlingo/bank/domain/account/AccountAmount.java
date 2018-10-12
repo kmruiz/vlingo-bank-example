@@ -1,7 +1,10 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
+import lombok.Value;
+
 import java.math.BigDecimal;
 
+@Value
 public class AccountAmount {
   private final BigDecimal value;
 
@@ -13,7 +16,7 @@ public class AccountAmount {
     this.value = value;
   }
 
-  public BigDecimal value() {
-    return value;
+  public static AccountAmount of(double decimal) {
+    return new AccountAmount(BigDecimal.valueOf(decimal));
   }
 }

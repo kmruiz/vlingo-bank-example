@@ -26,21 +26,17 @@ public class CustomerResource extends ResourceHandler {
         Customer.addressOf(stage(), id)
     );
 
-    completes().with(Response.of(Response.Status.Ok, serialized(id)));
+    completes().with(Response.of(Response.Status.Created, serialized(id)));
   }
 
   public void openAccountForCustomer(final String customerId, final OpenAccountRequest openAccount) {
     Customer.find(stage(), CustomerId.of(customerId))
         .andThen(customer -> {
-          customer.openAccount(new AccountName(openAccount.getAccountName()))
+          customer.openAccount(AccountName.of(openAccount.getAccountName()))
               .andThen(account -> {
-                completes().with(Response.of(Response.Status.Ok, serialized(account)));
+                completes().with(Response.of(Response.Status.Created, serialized(account)));
               });
-        }).uponException(e -> {
-      System.err.println(e.getMessage());
-      e.printStackTrace();
-      return null;
-    });
+        });
   }
 
   public void depositIntoAccount(final String customerId, final String accountId, final DepositRequest deposit) {
@@ -49,6 +45,19 @@ public class CustomerResource extends ResourceHandler {
           customer.getAccount(AccountId.of(accountId))
               .andThen(account -> {
                 account.deposit(new AccountAmount(BigDecimal.valueOf(deposit.getAmount())))
+                    .andThen(balance -> {
+                      completes().with(Response.of(Response.Status.Ok, serialized(balance)));
+                    });
+              });
+        });
+  }
+
+  public void withdrawFromAccount(final String customerId, final String accountId, final DepositRequest deposit) {
+    Customer.find(stage(), CustomerId.of(customerId))
+        .after(customer -> {
+          customer.getAccount(AccountId.of(accountId))
+              .andThen(account -> {
+                account.withdraw(new AccountAmount(BigDecimal.valueOf(deposit.getAmount())))
                     .andThen(balance -> {
                       completes().with(Response.of(Response.Status.Ok, serialized(balance)));
                     });

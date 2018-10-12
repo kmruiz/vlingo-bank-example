@@ -1,12 +1,8 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
-import lombok.EqualsAndHashCode;
+import lombok.Value;
 
-@EqualsAndHashCode
+@Value(staticConstructor = "of")
 public class AccountName {
   private final String accountName;
-
-  public AccountName(final String accountName) {
-    this.accountName = accountName;
-  }
 }

@@ -18,15 +18,15 @@ public class AccountBalance {
   }
 
   public boolean thereIsEnoughFor(final AccountAmount amount) {
-    return value.compareTo(amount.value()) < 0;
+    return value.compareTo(amount.getValue()) < 0;
   }
 
   public AccountBalance add(final AccountAmount amount) {
-    return new AccountBalance(value.add(amount.value()));
+    return new AccountBalance(value.add(amount.getValue()));
   }
 
   public AccountBalance substract(final AccountAmount amount) {
-    return new AccountBalance(value.subtract(amount.value()));
+    return new AccountBalance(value.subtract(amount.getValue()));
   }
 
   public boolean isEmpty() {
