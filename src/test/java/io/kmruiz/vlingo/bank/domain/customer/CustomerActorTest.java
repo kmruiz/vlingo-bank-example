@@ -1,22 +1,15 @@
 package io.kmruiz.vlingo.bank.domain.customer;
 
 import io.kmruiz.vlingo.bank.ActorTest;
-import io.kmruiz.vlingo.bank.domain.account.Account;
-import io.kmruiz.vlingo.bank.domain.account.AccountBalance;
-import io.kmruiz.vlingo.bank.domain.account.AccountId;
 import io.kmruiz.vlingo.bank.domain.account.AccountName;
 import io.vlingo.actors.Definition;
-import io.vlingo.common.Outcome;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomerActorTest extends ActorTest {
     private Customer customer;
