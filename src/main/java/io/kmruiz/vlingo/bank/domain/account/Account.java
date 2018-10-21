@@ -1,16 +1,16 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
-import io.kmruiz.vlingo.bank.common.Result;
 import io.vlingo.actors.Address;
-import io.vlingo.actors.Completes;
+import io.vlingo.common.Completes;
 import io.vlingo.actors.Stage;
+import io.vlingo.common.Outcome;
 
 public interface Account {
-  Completes<Result<IllegalArgumentException, AccountBalance>> transfer(final AccountAmount amount, final AccountId beneficiary);
-  Completes<Result<IllegalArgumentException, AccountBalance>> deposit(final AccountAmount amount);
-  Completes<Result<IllegalArgumentException, AccountBalance>> withdraw(final AccountAmount amount);
-  Completes<Result<IllegalArgumentException, AccountBalance>> balance();
-  Completes<Result<IllegalArgumentException, AccountId>> close();
+  Completes<Outcome<IllegalArgumentException, AccountBalance>> transfer(final AccountAmount amount, final AccountId beneficiary);
+  Completes<Outcome<IllegalArgumentException, AccountBalance>> deposit(final AccountAmount amount);
+  Completes<Outcome<IllegalArgumentException, AccountBalance>> withdraw(final AccountAmount amount);
+  Completes<Outcome<IllegalArgumentException, AccountBalance>> balance();
+  Completes<Outcome<IllegalArgumentException, AccountId>> close();
 
   static Completes<Account> find(final Stage stage, final AccountId accountId) {
     return stage.actorOf(addressOf(stage, accountId), Account.class);

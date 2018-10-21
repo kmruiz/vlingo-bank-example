@@ -1,13 +1,15 @@
 package io.kmruiz.vlingo.bank.domain.customer;
 
-import io.kmruiz.vlingo.bank.common.Result;
 import io.kmruiz.vlingo.bank.domain.account.Account;
 import io.kmruiz.vlingo.bank.domain.account.AccountActor;
 import io.kmruiz.vlingo.bank.domain.account.AccountId;
 import io.kmruiz.vlingo.bank.domain.account.AccountName;
 import io.vlingo.actors.Actor;
-import io.vlingo.actors.Completes;
+import io.vlingo.common.Completes;
 import io.vlingo.actors.Definition;
+import io.vlingo.common.Failure;
+import io.vlingo.common.Outcome;
+import io.vlingo.common.Success;
 
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -23,7 +25,7 @@ public class CustomerActor extends Actor implements Customer {
   }
 
   @Override
-  public Completes<Result<IllegalArgumentException, AccountId>> openAccount(final AccountName accountName) {
+  public Completes<Outcome<IllegalArgumentException, AccountId>> openAccount(final AccountName accountName) {
     final var accountId = AccountId.forNewAccount();
     final var accountAddress = Account.addressOf(stage(), accountId);
 
@@ -33,36 +35,33 @@ public class CustomerActor extends Actor implements Customer {
         accountAddress);
 
     this.accounts.add(accountId);
-    return completes().with(Result.ofSuccess(accountId));
+    return completes().with(Success.of(accountId));
   }
 
   @Override
-  public Completes<Result<IllegalArgumentException, Account>> getAccount(final AccountId accountId) {
+  public Completes<Outcome<IllegalArgumentException, Account>> getAccount(final AccountId accountId) {
     var eventually = completesEventually();
 
     if (this.accounts.contains(accountId)) {
-      Account.find(stage(), accountId).andThen(account -> {
-        eventually.with(Result.ofSuccess(account));
-      });
+      Account.find(stage(), accountId).andThenConsume(account -> eventually.with(Success.of(account)));
     }
 
     return completes();
   }
 
   @Override
-  public Completes<Result<NoSuchElementException, AccountId>> closeAccount(final AccountId accountId) {
+  public Completes<Outcome<NoSuchElementException, AccountId>> closeAccount(final AccountId accountId) {
     var eventually = completesEventually();
 
     if (this.accounts.contains(accountId)) {
       Account.find(stage(), accountId)
-          .andThen(account -> {
-            account.close().after(e -> {
-              this.accounts.remove(accountId);
-              eventually.with(Result.ofSuccess(accountId));
-            });
+          .andThenInto(Account::close)
+          .andThenConsume(account -> {
+            this.accounts.remove(accountId);
+            eventually.with(Success.of(accountId));
           });
     } else {
-      eventually.with(Result.ofFailure(new NoSuchElementException("Account with id " + accountId + " does not exist")));
+      eventually.with(Failure.of(new NoSuchElementException("Account with id " + accountId + " does not exist")));
     }
 
     return completes();
