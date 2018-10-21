@@ -1,7 +1,9 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
+import io.kmruiz.vlingo.bank.domain.account.exceptions.AccountNotEmptyException;
 import io.vlingo.actors.Actor;
 import io.vlingo.common.Completes;
+import io.vlingo.common.Failure;
 import io.vlingo.common.Outcome;
 import io.vlingo.common.Success;
 
@@ -48,7 +50,11 @@ public class AccountActor extends Actor implements Account {
     }
 
     @Override
-    public Completes<Outcome<IllegalArgumentException, AccountId>> close() {
-        return completes().with(Success.of(this.accountId));
+    public Completes<Outcome<RuntimeException, AccountId>> close() {
+        if (currentBalance.isEmpty()) {
+            return completes().with(Success.of(this.accountId));
+        } else {
+            return completes().with(Failure.of(new AccountNotEmptyException(accountId)));
+        }
     }
 }

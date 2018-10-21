@@ -33,4 +33,8 @@ public class AccountBalance {
     public AccountBalance subtract(final AccountAmount amount) {
         return new AccountBalance(account, value.subtract(amount.getValue()));
     }
+
+    public boolean isEmpty() {
+        return value.equals(BigDecimal.ZERO);
+    }
 }

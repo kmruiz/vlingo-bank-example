@@ -14,7 +14,7 @@ public interface Account {
 
     Completes<Outcome<IllegalArgumentException, AccountBalance>> balance();
 
-    Completes<Outcome<IllegalArgumentException, AccountId>> close();
+    Completes<Outcome<RuntimeException, AccountId>> close();
 
     static Completes<Account> find(final Stage stage, final AccountId accountId) {
         return stage.actorOf(addressOf(stage, accountId), Account.class);

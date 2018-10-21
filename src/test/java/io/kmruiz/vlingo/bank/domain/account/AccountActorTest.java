@@ -1,11 +1,13 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
 import io.kmruiz.vlingo.bank.ActorTest;
+import io.kmruiz.vlingo.bank.domain.account.exceptions.AccountNotEmptyException;
 import io.vlingo.actors.Definition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AccountActorTest extends ActorTest {
     private Account account;
@@ -29,5 +31,11 @@ public class AccountActorTest extends ActorTest {
         final var balance = account.withdraw(AccountAmount.of(250)).await().get();
 
         assertEquals(250, balance.getValue().doubleValue());
+    }
+
+    @Test
+    void thatAnAccountCanNotBeClosedIfItsNotEmpty() {
+        account.deposit(AccountAmount.of(500)).await();
+        assertThrows(AccountNotEmptyException.class, () -> account.close().await().get());
     }
 }
