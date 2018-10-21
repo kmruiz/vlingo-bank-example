@@ -1,4 +1,4 @@
-vlingo-bank-example
+vlingo-bank-example [![Build Status](https://travis-ci.org/kmruiz/vlingo-bank-example.svg?branch=master)](https://travis-ci.org/kmruiz/vlingo-bank-example)
 ===================
 
 Example application that shows how to write an application using vlingo/http and vlingo/actors. 
