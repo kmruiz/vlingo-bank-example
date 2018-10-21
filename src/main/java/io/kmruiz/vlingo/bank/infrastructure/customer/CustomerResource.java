@@ -11,13 +11,8 @@ import io.kmruiz.vlingo.bank.infrastructure.customer.request.OpenAccountRequest;
 import io.kmruiz.vlingo.bank.infrastructure.customer.request.WithdrawRequest;
 import io.vlingo.actors.Definition;
 import io.vlingo.common.Failure;
-import io.vlingo.common.Outcome;
-import io.vlingo.common.Success;
-import io.vlingo.common.Tuple2;
 import io.vlingo.http.Response;
 import io.vlingo.http.resource.ResourceHandler;
-
-import java.util.function.Supplier;
 
 import static io.vlingo.http.resource.serialization.JsonSerialization.serialized;
 

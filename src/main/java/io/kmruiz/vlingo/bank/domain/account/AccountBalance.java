@@ -1,7 +1,10 @@
 package io.kmruiz.vlingo.bank.domain.account;
 
+import lombok.Value;
+
 import java.math.BigDecimal;
 
+@Value
 public class AccountBalance {
     private final AccountId account;
     private final BigDecimal value;
