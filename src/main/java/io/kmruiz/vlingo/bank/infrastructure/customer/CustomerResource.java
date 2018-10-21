@@ -97,19 +97,4 @@ public class CustomerResource extends ResourceHandler {
                         id -> Response.of(Response.Status.Ok, serialized(id))
                 )));
     }
-
-    private Outcome<RuntimeException, Tuple2<CustomerId, AccountId>> parseIds(final String customerId, final String accountId) {
-        Outcome<RuntimeException, CustomerId> customerIdResult = wrap(() -> CustomerId.of(customerId));
-        Outcome<RuntimeException, AccountId> accountIdResult = wrap(() -> AccountId.of(accountId));
-
-        return customerIdResult.andThenInto(cid -> accountIdResult.andThen(aid -> Tuple2.from(cid, aid)));
-    }
-
-    private <T> Outcome<RuntimeException, T> wrap(final Supplier<T> supplier) {
-        try {
-            return Success.of(supplier.get());
-        } catch (Throwable ex) {
-            return Failure.of(new RuntimeException(ex));
-        }
-    }
 }
