@@ -1,6 +1,5 @@
 package io.kmruiz.vlingo.bank.infrastructure.customer;
 
-import io.kmruiz.vlingo.bank.domain.account.Account;
 import io.kmruiz.vlingo.bank.domain.account.AccountAmount;
 import io.kmruiz.vlingo.bank.domain.account.AccountId;
 import io.kmruiz.vlingo.bank.domain.account.AccountName;
@@ -15,7 +14,6 @@ import io.vlingo.actors.Definition;
 import io.vlingo.common.*;
 import io.vlingo.http.Response;
 
-import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
@@ -36,70 +34,66 @@ public class CustomerResource extends CommonResource {
     public void openAccountForCustomer(final String customerId, final OpenAccountRequest openAccount) {
         Customer.find(stage(), CustomerId.of(customerId))
                 .andThenInto(customer -> customer.openAccount(AccountName.of(openAccount.getAccountName())))
-                .andThenInto(maybeAccount -> Completes.withSuccess(maybeAccount.resolve(
+                .andThenConsume(maybeAccount -> completes().with(maybeAccount.resolve(
                         ex -> Response.of(Response.Status.BadRequest, serialized(ex)),
                         accountId -> Response.of(Response.Status.Created, serialized(accountId))
-                )))
-                .recoverFrom(ex -> Response.of(Response.Status.BadRequest, serialized(ex)));
+                )));
     }
 
     public void getAccountBalanceForCustomer(final String customerId, final String accountId) {
-        parseIds(customerId, accountId).andThen(parameters -> {
-            var validCustomerId = parameters._1;
-            var validAccountId = parameters._2;
+        var validCustomerId = CustomerId.of(customerId);
+        var validAccountId = AccountId.of(accountId);
 
-            return Customer.find(stage(), validCustomerId)
-                    .andThenInto(customer -> customer.getAccount(validAccountId))
-                    .andThenInto(account -> account.get().balance())
-                    .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)));
-        }).resolve(
-                ex -> Completes.withSuccess(Response.of(Response.Status.BadRequest, serialized(ex))),
-                balance -> Completes.withSuccess(Response.of(Response.Status.Ok, serialized(balance)))
-        );
+        Customer.find(stage(), validCustomerId)
+                .andThenInto(customer -> customer.getAccount(validAccountId))
+                .andThenInto(account -> account.get().balance())
+                .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)))
+                .andThenConsume(maybeBalance -> completes().with(maybeBalance.resolve(
+                        ex -> Response.of(Response.Status.BadRequest, serialized(ex)),
+                        balance -> Response.of(Response.Status.Ok, serialized(balance))
+                )));
     }
 
     public void depositIntoAccount(final String customerId, final String accountId, final DepositRequest deposit) {
-        parseIds(customerId, accountId).andThen(parameters -> {
-            var validCustomerId = parameters._1;
-            var validAccountId = parameters._2;
+        var validCustomerId = CustomerId.of(customerId);
+        var validAccountId = AccountId.of(accountId);
 
-            return Customer.find(stage(), validCustomerId)
-                    .andThenInto(customer -> customer.getAccount(validAccountId))
-                    .andThenInto(account -> account.get().deposit(AccountAmount.of(deposit.getAmount())))
-                    .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)));
-        }).resolve(
-                ex -> Completes.withSuccess(Response.of(Response.Status.BadRequest, serialized(ex))),
-                balance -> Completes.withSuccess(Response.of(Response.Status.Ok, serialized(balance)))
-        );
+        Customer.find(stage(), validCustomerId)
+                .andThenInto(customer -> customer.getAccount(validAccountId))
+                .andThenInto(account -> account.get().deposit(AccountAmount.of(deposit.getAmount())))
+                .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)))
+                .andThenConsume(maybeBalance -> completes().with(maybeBalance.resolve(
+                        ex -> Response.of(Response.Status.BadRequest, serialized(ex)),
+                        balance -> Response.of(Response.Status.Ok, serialized(balance))
+                )));
     }
 
     public void withdrawFromAccount(final String customerId, final String accountId, final WithdrawRequest withdraw) {
-        parseIds(customerId, accountId).andThen(parameters -> {
-            var validCustomerId = parameters._1;
-            var validAccountId = parameters._2;
+        var validCustomerId = CustomerId.of(customerId);
+        var validAccountId = AccountId.of(accountId);
 
-            return Customer.find(stage(), validCustomerId)
-                    .andThenInto(customer -> customer.getAccount(validAccountId))
-                    .andThenInto(account -> account.get().withdraw(AccountAmount.of(withdraw.getAmount())))
-                    .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)));
-        }).resolve(
-                ex -> Completes.withSuccess(Response.of(Response.Status.BadRequest, serialized(ex))),
-                balance -> Completes.withSuccess(Response.of(Response.Status.Ok, serialized(balance)))
-        );
+        Customer.find(stage(), validCustomerId)
+                .andThenInto(customer -> customer.getAccount(validAccountId))
+                .andThenInto(account -> account.get().withdraw(AccountAmount.of(withdraw.getAmount())))
+                .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)))
+                .andThenConsume(maybeBalance -> completes().with(maybeBalance.resolve(
+                        ex -> Response.of(Response.Status.BadRequest, serialized(ex)),
+                        balance -> Response.of(Response.Status.Ok, serialized(balance))
+                )));
     }
 
     public void closeAccount(final String customerId, final String accountId) {
-        parseIds(customerId, accountId).andThen(parameters -> {
-            var validCustomerId = parameters._1;
-            var validAccountId = parameters._2;
+        var validCustomerId = CustomerId.of(customerId);
+        var validAccountId = AccountId.of(accountId);
 
-            return Customer.find(stage(), validCustomerId)
-                    .andThenInto(customer -> customer.closeAccount(validAccountId))
-                    .recoverFrom(ex -> Failure.of(new NoSuchElementException(ex.getMessage())));
-        }).resolve(
-                ex -> Completes.withSuccess(Response.of(Response.Status.BadRequest, serialized(ex))),
-                balance -> Completes.withSuccess(Response.of(Response.Status.Ok, serialized(balance)))
-        );
+        Customer.find(stage(), validCustomerId)
+                .andThenInto(customer -> customer.getAccount(validAccountId))
+                .andThenInto(account -> account.get().close())
+                .recoverFrom(ex -> Failure.of(new IllegalArgumentException(ex)))
+                .andThenConsume(maybeId -> completes().with(maybeId.resolve(
+                        ex -> Response.of(Response.Status.BadRequest, serialized(ex)),
+                        id -> Response.of(Response.Status.Ok, serialized(id))
+                )));
     }
 
     private Outcome<RuntimeException, Tuple2<CustomerId, AccountId>> parseIds(final String customerId, final String accountId) {
