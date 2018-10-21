@@ -6,7 +6,6 @@ import io.kmruiz.vlingo.bank.domain.account.AccountBalance;
 import io.kmruiz.vlingo.bank.domain.account.AccountId;
 import io.kmruiz.vlingo.bank.domain.account.AccountName;
 import io.vlingo.actors.Definition;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
