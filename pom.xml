@@ -74,22 +74,12 @@
         -->
         <dependency>
             <groupId>io.vlingo</groupId>
-            <artifactId>vlingo-common</artifactId>
-            <version>${version.vlingo}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.vlingo</groupId>
             <artifactId>vlingo-actors</artifactId>
             <version>${version.vlingo}</version>
         </dependency>
         <dependency>
             <groupId>io.vlingo</groupId>
             <artifactId>vlingo-http</artifactId>
-            <version>${version.vlingo}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.vlingo</groupId>
-            <artifactId>vlingo-lattice</artifactId>
             <version>${version.vlingo}</version>
         </dependency>
     </dependencies>

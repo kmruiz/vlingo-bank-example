@@ -44,6 +44,8 @@ public class CustomerActor extends Actor implements Customer {
 
         if (this.accounts.contains(accountId)) {
             Account.find(stage(), accountId).andThenConsume(account -> eventually.with(Success.of(account)));
+        } else {
+            eventually.with(Failure.of(new NoSuchElementException(accountId.toString())));
         }
 
         return completes();

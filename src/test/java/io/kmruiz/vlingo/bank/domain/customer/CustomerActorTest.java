@@ -6,14 +6,17 @@ import io.kmruiz.vlingo.bank.domain.account.AccountBalance;
 import io.kmruiz.vlingo.bank.domain.account.AccountId;
 import io.kmruiz.vlingo.bank.domain.account.AccountName;
 import io.vlingo.actors.Definition;
+import io.vlingo.common.Outcome;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CustomerActorTest extends ActorTest {
     private Customer customer;
@@ -27,13 +30,21 @@ public class CustomerActorTest extends ActorTest {
 
     @Test
     void thatCreatesANewAccountWithEmptyBalance() {
-        AccountId createdAccountId = customer.openAccount(randomAccountName()).await().get();
-        Account account = customer.getAccount(createdAccountId).await().getOrNull();
+        final var createdAccountId = customer.openAccount(randomAccountName()).await().get();
+        final var account = customer.getAccount(createdAccountId).await().getOrNull();
 
         assertNotNull(account);
 
-        AccountBalance balance = account.balance().await().get();
-        assertEquals(BigDecimal.ZERO, balance.getValue());
+        final var balance = account.balance().await().get();
+        assertEquals(0, balance.getValue().doubleValue());
+    }
+
+    @Test
+    void thatANewAccountCanBeClosed() {
+        final var accountId = customer.openAccount(randomAccountName()).await().get();
+        customer.closeAccount(accountId).await();
+
+        assertThrows(NoSuchElementException.class, () -> customer.getAccount(accountId).await().get());
     }
 
     private AccountName randomAccountName() {
