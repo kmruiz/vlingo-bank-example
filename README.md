@@ -18,8 +18,3 @@ Features
 * Delete accounts (when the balance is 0)
 
 You can see a list of valid requests and a user flow in the [HTTP Test Suite](src/test/http/customer.http).
-
-To Do
------
-
-* Unit tests for vlingo actors
