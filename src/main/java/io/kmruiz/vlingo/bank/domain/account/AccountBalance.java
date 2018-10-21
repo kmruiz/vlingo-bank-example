@@ -35,6 +35,6 @@ public class AccountBalance {
     }
 
     public boolean isEmpty() {
-        return value.equals(BigDecimal.ZERO);
+        return value.doubleValue() == 0;
     }
 }

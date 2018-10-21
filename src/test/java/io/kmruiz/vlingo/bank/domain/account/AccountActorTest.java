@@ -34,8 +34,26 @@ public class AccountActorTest extends ActorTest {
     }
 
     @Test
+    void thatAnAccountCanBeClosedIfItsEmpty() {
+        account.close().await().get();
+    }
+
+    @Test
     void thatAnAccountCanNotBeClosedIfItsNotEmpty() {
         account.deposit(AccountAmount.of(500)).await();
         assertThrows(AccountNotEmptyException.class, () -> account.close().await().get());
+    }
+
+    @Test
+    void thatCanTransferAccountBetweenAccounts() {
+        final var beneficiaryAccountId = AccountId.forNewAccount();
+        final var beneficiaryAccount = world().stage().actorFor(Definition.has(AccountActor.class, Definition.parameters(beneficiaryAccountId)), Account.class, Account.addressOf(world().stage(), beneficiaryAccountId));
+
+        account.deposit(AccountAmount.of(500)).await();
+        final var currentBalance = account.transfer(AccountAmount.of(200), beneficiaryAccountId).await().get();
+        final var beneficiaryBalance = beneficiaryAccount.balance().await().get();
+
+        assertEquals(300, currentBalance.getValue().doubleValue());
+        assertEquals(200, beneficiaryBalance.getValue().doubleValue());
     }
 }
