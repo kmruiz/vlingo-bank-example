@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class OpenAccountRequest {
-  private final String accountName;
+    private final String accountName;
 }

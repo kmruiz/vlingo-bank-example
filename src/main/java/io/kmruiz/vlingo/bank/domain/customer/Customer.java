@@ -6,13 +6,13 @@ import io.vlingo.actors.Stage;
 import io.vlingo.common.Completes;
 
 public interface Customer extends AccountOwner {
-  static Completes<Customer> find(final Stage stage, final CustomerId customerId) {
-    return stage.actorOf(addressOf(stage, customerId), Customer.class);
-  }
+    static Completes<Customer> find(final Stage stage, final CustomerId customerId) {
+        return stage.actorOf(addressOf(stage, customerId), Customer.class);
+    }
 
-  static Address addressOf(final Stage stage, final CustomerId customerId) {
-    return stage.world().addressFactory().from(
-        String.valueOf(customerId.getUuid().getMostSignificantBits() & Long.MAX_VALUE)
-    );
-  }
+    static Address addressOf(final Stage stage, final CustomerId customerId) {
+        return stage.world().addressFactory().from(
+                String.valueOf(customerId.getUuid().getMostSignificantBits() & Long.MAX_VALUE)
+        );
+    }
 }

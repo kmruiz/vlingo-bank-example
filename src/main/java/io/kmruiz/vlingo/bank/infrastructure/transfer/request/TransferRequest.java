@@ -4,13 +4,13 @@ import lombok.Value;
 
 @Value
 public class TransferRequest {
-  @Value
-  public static class Owner {
-    private final String customer;
-    private final String account;
-  }
+    @Value
+    public static class Owner {
+        private final String customer;
+        private final String account;
+    }
 
-  private final Owner from;
-  private final double amount;
-  private final String to;
+    private final Owner from;
+    private final double amount;
+    private final String to;
 }

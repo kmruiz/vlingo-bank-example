@@ -6,17 +6,17 @@ import java.math.BigDecimal;
 
 @Value
 public class AccountAmount {
-  private final BigDecimal value;
+    private final BigDecimal value;
 
-  public AccountAmount(final BigDecimal value) {
-    if (value.compareTo(BigDecimal.ZERO) < 0) {
-      throw new IllegalStateException("Invalid negative amount " + value);
+    public AccountAmount(final BigDecimal value) {
+        if (value.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalStateException("Invalid negative amount " + value);
+        }
+
+        this.value = value;
     }
 
-    this.value = value;
-  }
-
-  public static AccountAmount of(double decimal) {
-    return new AccountAmount(BigDecimal.valueOf(decimal));
-  }
+    public static AccountAmount of(double decimal) {
+        return new AccountAmount(BigDecimal.valueOf(decimal));
+    }
 }

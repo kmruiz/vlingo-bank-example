@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class WithdrawRequest {
-  private final double amount;
+    private final double amount;
 }

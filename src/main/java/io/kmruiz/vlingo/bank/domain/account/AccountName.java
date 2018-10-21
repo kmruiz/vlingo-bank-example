@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value(staticConstructor = "of")
 public class AccountName {
-  private final String accountName;
+    private final String accountName;
 }
