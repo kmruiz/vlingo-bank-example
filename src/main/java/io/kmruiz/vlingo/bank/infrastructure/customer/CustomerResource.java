@@ -41,16 +41,16 @@ public class CustomerResource {
                         .param(String.class)
                         .param(String.class)
                         .handle(resource::getAccountBalanceForCustomer),
-                put("/customers/{customerId}/accounts/{accountId}")
-                        .param(String.class)
-                        .param(String.class)
-                        .body(DepositRequest.class)
-                        .handle(resource::depositIntoAccount),
                 put("/customers/{customerId}/accounts/{accountId}/withdraw")
                         .param(String.class)
                         .param(String.class)
                         .body(WithdrawRequest.class)
                         .handle(resource::withdrawFromAccount),
+                put("/customers/{customerId}/accounts/{accountId}")
+                        .param(String.class)
+                        .param(String.class)
+                        .body(DepositRequest.class)
+                        .handle(resource::depositIntoAccount),
                 delete("/customers/{customerId}/accounts/{accountId}")
                         .param(String.class)
                         .param(String.class)
